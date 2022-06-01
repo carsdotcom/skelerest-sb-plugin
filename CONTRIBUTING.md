@@ -47,7 +47,7 @@ gone over the documentation before starting on any contributions to the project.
 
 ### Announce Your Work
 
-All issues (bugs, features, and tasks) are tracked in GitHub [Issues](https://github.com/carsdotcom/skelerest/issues).
+All issues (bugs, features, and tasks) are tracked in GitHub [Issues](https://github.com/carsdotcom/skelerest-sb-plugin/issues).
 
 If you would like to request a new feature or raise a bug, you can use the appropriate issues
 templates to do so. Before opening a feature request, be sure it fits into the 'Project Scope'
