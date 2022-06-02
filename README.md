@@ -11,7 +11,7 @@ Different REST requests can be configured in the `components.skelerest` section 
 YAML once the plugin has been installed. Requests can be configure for GET, POST, PUT, and DELETE
 methods. Values in the requests (endpoint, params, headers, and body) can be parameterized using
 curly braces using the following syntax: ({variable_name:default_value}). The default value, as
-well as the preceding colon or optional. If the variable is provided without a default value, it
+well as the preceding colon are optional. If the variable is provided without a default value, it
 will be required by the associated Skelebot CLI command.
 
 The example below creates four different Skelebot CLI commands with an assortment of variables.
