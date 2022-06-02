@@ -5,8 +5,8 @@ class RestTuple(SkeleYaml):
     """ Holds the information for name value pairs for REST requests (query/header parameters) """
     
     schema = Schema({
-        'name': And(str, error='SkeleRequestTuple \'name\' must be a String'),
-        'value': And(str, error='SkeleRequestTuple \'value\' must be a String')
+        'name': And(str, error='RestTuple \'name\' must be a String'),
+        'value': And(str, error='RestTuple \'value\' must be a String')
     }, ignore_extra_keys=True)
 
     name = None
