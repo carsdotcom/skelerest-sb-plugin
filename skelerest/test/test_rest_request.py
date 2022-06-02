@@ -42,13 +42,11 @@ class TestRestRequest(unittest.TestCase):
         self.assertEqual(restRequest.endpoint, "http://not a real {site}")
         self.assertEqual(restRequest.method, "POST")
 
-        i = 0
         exp_param_names = ["one", "two"]
         exp_param_values = ["{param-one:1}", "{param-two:2}"]
-        for param in restRequest.params:
+        for i, param in enumerate(restRequest.params):
             self.assertEqual(param.name, exp_param_names[i])
             self.assertEqual(param.value, exp_param_values[i])
-            i += 1
 
         i = 0
         exp_header_names = ["a", "b"]
