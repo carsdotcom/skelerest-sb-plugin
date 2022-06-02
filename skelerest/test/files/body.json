@@ -1,0 +1,9 @@
+{
+    "id": "{id:0}",
+    "name": "test",
+    "items": ["a", "b", "c"],
+    "parent": {
+        "id": "{parent-id}",
+        "name": "{parent-name}"
+    }
+}
