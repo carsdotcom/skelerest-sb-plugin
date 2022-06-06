@@ -5,7 +5,7 @@ Documenting All Changes to the Skelerest Plugin Project
 
 ## v1.0.2
 #### Added
-- **Release Action** | Adds action to create a Release in GitHub when code is merged with master
+- **Release Action** | Adds action to create a Release in GitHub when code is merged with main
 - **Build Artifact** | Builds the Zip Artifact and adds it to the Release
 - **Release Notes** | Generates the Release Notes from Changelog and adds it to the Release
 
