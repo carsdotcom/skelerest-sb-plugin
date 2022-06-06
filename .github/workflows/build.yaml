@@ -1,0 +1,41 @@
+name: Build Release Artifact
+
+env:
+  VERSION: 0.0.0
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Plugin Artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.6'
+
+      - name: Set Version
+        run: |
+          VER=$(cat VERSION)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+
+      - name: Create Artifact
+        run: zip skelerest.zip skelerest/*.py
+
+      - name: Build Release Notes from Changelog
+        run: python .github/scripts/generate_rn.py
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: skelerest.zip
+          name: Version ${{ env.VERSION }}
+          tag_name: v${{ env.VERSION }}
+          body_path: release-notes.md
