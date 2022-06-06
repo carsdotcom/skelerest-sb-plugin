@@ -5,8 +5,8 @@ A plugin for Skelebot that allows for pre-configured and parameterized REST comm
 
 ---
 
-[![CircleCI token](https://circleci.com/gh/carsdotcom/skelerest-sb-plugin/tree/master.svg?style=svg)](https://circleci.com/gh/carsdotcom/skelerest-sb-plugin)
-[![codecov](https://codecov.io/gh/carsdotcom/skelerest-sb-plugin/branch/master/graph/badge.svg)](https://codecov.io/gh/carsdotcom/skelerest-sb-plugin)
+[![CircleCI token](https://circleci.com/gh/carsdotcom/skelerest-sb-plugin/tree/main.svg?style=svg)](https://circleci.com/gh/carsdotcom/skelerest-sb-plugin)
+[![codecov](https://codecov.io/gh/carsdotcom/skelerest-sb-plugin/branch/main/graph/badge.svg)](https://codecov.io/gh/carsdotcom/skelerest-sb-plugin)
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
 
 ### Configuration
