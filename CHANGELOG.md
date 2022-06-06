@@ -12,6 +12,7 @@ Documenting All Changes to the Skelerest Plugin Project
 ---
 
 ## v1.0.1
+#### Merged: 2022-06-03
 #### Added
 - **Build Tools** | Integration with CircleCI and CodeCov to run unit tests and track coverage
 - **README** | Adding CircleCI, CodeCov, and MIT License badges
