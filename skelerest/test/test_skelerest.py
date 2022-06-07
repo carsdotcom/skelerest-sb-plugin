@@ -122,6 +122,7 @@ class TestSkelerest(unittest.TestCase):
     def test_execute_get(self, mock_req_api):
         mock_response = mock.MagicMock()
         mock_response.status_code = 200
+        mock_response.ok = True
         mock_req_api.get.return_value = mock_response
 
         skelerest = Skelerest.load(self.CONFIG_VALID)
@@ -147,6 +148,7 @@ class TestSkelerest(unittest.TestCase):
     def test_execute_post(self, mock_req_api):
         mock_response = mock.MagicMock()
         mock_response.status_code = 200
+        mock_response.ok = True
         mock_req_api.post.return_value = mock_response
 
         skelerest = Skelerest.load(self.CONFIG_VALID)
@@ -167,13 +169,14 @@ class TestSkelerest(unittest.TestCase):
         endpoint = "http://not a real post"
         params = {'one': '01', 'two': '02'}
         headers = {'a': 'AA', 'b': 'BB'}
-        json = '"{\'id\': \'1\', \'name\': \'test\', \'items\': [\'a\', \'b\', \'c\'], \'parent\': {\'id\': \'2\', \'name\': \'you\'}}"'
+        json = {'id': '1', 'name': 'test', 'items': ['a', 'b', 'c'], 'parent': {'id': '2', 'name': 'you'}}
         mock_req_api.post.assert_called_with(endpoint, json=json, params=params, headers=headers)
 
     @mock.patch('skelerest.skelerest.request_api')
     def test_execute_put(self, mock_req_api):
         mock_response = mock.MagicMock()
         mock_response.status_code = 200
+        mock_response.ok = True
         mock_req_api.put.return_value = mock_response
 
         skelerest = Skelerest.load(self.CONFIG_VALID)
@@ -194,13 +197,14 @@ class TestSkelerest(unittest.TestCase):
         endpoint = "http://not a real put"
         params = {'one': '01', 'two': '02'}
         headers = {'a': 'AA', 'b': 'BB'}
-        json = '"{\'id\': \'123\', \'name\': \'test\', \'items\': [\'a\', \'b\', \'c\'], \'parent\': {\'id\': \'2\', \'name\': \'you\'}}"'
+        json = {'id': '123', 'name': 'test', 'items': ['a', 'b', 'c'], 'parent': {'id': '2', 'name': 'you'}}
         mock_req_api.put.assert_called_with(endpoint, json=json, params=params, headers=headers)
 
     @mock.patch('skelerest.skelerest.request_api')
     def test_execute_delete(self, mock_req_api):
         mock_response = mock.MagicMock()
         mock_response.status_code = 200
+        mock_response.ok = True
         mock_req_api.delete.return_value = mock_response
 
         skelerest = Skelerest.load(self.CONFIG_VALID)
@@ -226,6 +230,7 @@ class TestSkelerest(unittest.TestCase):
     def test_execute_error_response(self, mock_req_api):
         mock_response = mock.MagicMock()
         mock_response.status_code = 400
+        mock_response.ok = False
         mock_req_api.get.return_value = mock_response
 
         skelerest = Skelerest.load(self.CONFIG_VALID)
