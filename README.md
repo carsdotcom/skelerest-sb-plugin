@@ -85,3 +85,10 @@ skelebot get-metadata --name test --username test-test --api_version 1.2.3
 |SKELEREST| - username : test-test
 |SKELEREST| Response: 200 OK
 ```
+
+### Example
+
+In the `exmaple` folder a simple API project has been setup that can be used as an example for how
+to use the Skelerest plugin to make REST requests. This simple example exposes four endpoints for
+GET, POST, PUT, and DELETE. A Skelebot.yaml config has already been setup to make requests against
+each endpoint and there is a single Skelebot job setup to run the API in Docker on port 5000.
