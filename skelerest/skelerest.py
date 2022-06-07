@@ -1,4 +1,5 @@
 import json
+import ast
 import requests as request_api
 from schema import Schema, And, Optional
 from skelebot.objects.component import Activation, Component
@@ -45,6 +46,7 @@ class Skelerest(Component):
             The message to be displayed via a  print command
         """
 
+        message = message.replace("\n", "\n|SKELEREST| ")
         print(f"|SKELEREST| {message}")
 
     def __show_execution(self, method, endpoint, params, headers, body):
@@ -142,7 +144,7 @@ class Skelerest(Component):
             elif (var.location == RestRequest.RestVar.Location.BODY):
                 body = body.replace(var_key, var_value)
 
-        json_body = json.dumps(body)
+        body_dict = ast.literal_eval(body)
         params = json.loads(params.replace("'", "\""))
         headers = json.loads(headers.replace("'", "\""))
 
@@ -150,14 +152,16 @@ class Skelerest(Component):
         if (req.method == "GET"):
             response = request_api.get(endpoint, params=params, headers=headers)
         elif (req.method == "POST"):
-            response = request_api.post(endpoint, json=json_body, params=params, headers=headers)
+            response = request_api.post(endpoint, json=body_dict, params=params, headers=headers)
         elif (req.method == "PUT"):
-            response = request_api.put(endpoint, json=json_body, params=params, headers=headers)
+            response = request_api.put(endpoint, json=body_dict, params=params, headers=headers)
         elif (req.method == "DELETE"):
             response = request_api.delete(endpoint, params=params, headers=headers)
 
-        if (response.status_code < 400):
+        if (response.ok):
             self.__display(f"SUCCESS: {response.status_code}")
+            if response.text is not None:
+                self.__display(response.text)
         else:
             self.__display(f"ERROR: {response.status_code}")
             exit(1)

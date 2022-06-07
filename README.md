@@ -72,16 +72,46 @@ with it's own command in Skelebot, allowing for the parameterized variables in t
 examined via the help command.
 
 ```
-skelebot get-metadata --help
+>> skelebot get-metadata --help
 ```
 
 The following command would trigger the a GET request ...
 
 ```
-skelebot get-metadata --name test --username test-test --api_version 1.2.3
+>> skelebot get-metadata --name test --username test-test --api_version 1.2.3
 |SKELEREST| Executing : GET http://127.0.0.1:5000/quotes?api_version=1.2.3
 |SKELEREST| HEADERS
 |SKELEREST| - name : test
 |SKELEREST| - username : test-test
-|SKELEREST| Response: 200 OK
+|SKELEREST| SUCCESS: 200
+```
+
+### Example
+
+In the `example/` folder a simple project has been setup that can be used as an example for how to
+use the Skelerest plugin to make REST requests. The API here exposes four endpoints for GET, POST,
+PUT, and DELETE. A Skelebot.yaml config has already been setup to make requests against each
+endpoint and there is a single Skelebot job setup to run the API in Docker on port 5000.
+
+
+In the `example/` folder, use the `run_api` job to start the test API in Docker on port 5000.
+```
+>> skelebot run_api
+```
+
+Once the API is up and running, requests can be made through the skelerest plugin.
+```
+>> skelebot get-notes
+|SKELEREST| GET http://127.0.0.1:5000/notes
+|SKELEREST| PARAMS
+|SKELEREST| HEADERS
+|SKELEREST| SUCCESS: 200
+|SKELEREST| {
+|SKELEREST|   "notes": {
+|SKELEREST|     "1": "Finish Writing Code",
+|SKELEREST|     "2": "Go to the Store",
+|SKELEREST|     "3": "Mow the Lawn"
+|SKELEREST|   }
+|SKELEREST| }
+|SKELEREST|
 ```

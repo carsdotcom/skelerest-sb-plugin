@@ -1,0 +1,42 @@
+name: example-project
+description: Example for Skelerest Plugin
+maintainer: Sean Shookman
+contact: sshookman@cars.com
+
+components:
+  skelerest:
+    requests:
+    - name: notes
+      endpoint: "http://127.0.0.1:5000/notes"
+      method: GET
+    - name: notes
+      endpoint: "http://127.0.0.1:5000/notes"
+      method: POST
+      body:
+        note: "{note}"
+    - name: notes
+      endpoint: "http://127.0.0.1:5000/notes/{id}"
+      method: PUT
+      body:
+        note: "{note}"
+    - name: notes
+      endpoint: "http://127.0.0.1:5000/notes/{id}"
+      method: DELETE
+
+language: Python
+pythonVersion: '3.6'
+dependencies:
+- flask~=2.0.3
+- flask-jsonpify
+- flask-restful
+
+gpu: false
+primaryExe: CMD
+
+ports:
+- "5000:5000"
+
+jobs:
+- name: run_api
+  source: api.py
+  help: Run the API that can be used to test the Skelerest requests
