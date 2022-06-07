@@ -46,6 +46,7 @@ class Skelerest(Component):
             The message to be displayed via a  print command
         """
 
+        message = message.replace("\n", "\n|SKELEREST| ")
         print(f"|SKELEREST| {message}")
 
     def __show_execution(self, method, endpoint, params, headers, body):
