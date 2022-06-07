@@ -3,6 +3,16 @@ Documenting All Changes to the Skelerest Plugin Project
 
 ---
 
+## v1.1.0
+#### Added
+- **Example Project** | Adds example project to get people familiar with the plugin
+#### Changed
+- **Skelerest Messages** | Add more details to the response that is printed after requests.
+#### Fixes
+- **Skelerest** | Slightly tweaked the way JSON payloads are sent
+
+---
+
 ## v1.0.2
 #### Added
 - **Release Action** | Adds action to create a Release in GitHub when code is merged with main
