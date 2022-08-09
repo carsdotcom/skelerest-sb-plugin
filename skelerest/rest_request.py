@@ -5,7 +5,7 @@ from schema import Schema, And, Or, Optional
 from skelebot.objects.skeleYaml import SkeleYaml
 from .rest_tuple import RestTuple
 
-VARIABLE_REGEX = "{[a-zA-Z]+:?[^}]+?}" 
+VARIABLE_REGEX = "{[a-zA-Z]+:?[^}]+?}"
 
 class RestRequest(SkeleYaml):
     """ Holds the information required for a single pre-configured REST request """
@@ -53,7 +53,10 @@ class RestRequest(SkeleYaml):
         'method': And(str, error='SkeleRequest \'method\' must be a String'), #TODO: Should add CRUD level content validation (POST/PUT contains body, method name is one of the four, etc.)
         Optional('params'): And(list, error='SkeleRequest \'params\' must be a list'),
         Optional('headers'): And(list, error='SkeleRequest \'headers\' must be a list'),
-        Optional('body'): Or(dict, str, error='SkeleRequest \'body\' must be a Dictionary or String')
+        Optional('body'): Or(dict, str, error='SkeleRequest \'body\' must be a Dictionary or String'),
+        Optional('aws'): And(bool, error='SkeleRequest \'aws\' must be a boolean'),
+        Optional('awsProfile'): And(str, error='SkeleRequest \'awsProfile\' must be a String'),
+        Optional('awsRegion'): And(str, error='SkeleRequest \'awsRegion\' must be a String')
     }, ignore_extra_keys=True)
 
     name = None
@@ -63,8 +66,12 @@ class RestRequest(SkeleYaml):
     headers = None
     body = None
     variables = None
+    aws = None
+    awsProfile = None
+    awsRegion = None
 
-    def __init__(self, name, endpoint, method, params=None, headers=None, body=None):
+    def __init__(self, name, endpoint, method, params=None, headers=None, body=None, aws=False,
+                 awsProfile=None, awsRegion="us-east-1"):
         """
         Initialize the RestRequest with all necessary and optional details
 
@@ -87,6 +94,7 @@ class RestRequest(SkeleYaml):
         body : dict or str (optional)
             A Dictionary representing the POST/PUT body of the request or a string with the path to
             the JSON request body file
+            TODO
         """
 
         self.name = name
@@ -94,6 +102,9 @@ class RestRequest(SkeleYaml):
         self.method = method
         self.params = params
         self.headers = headers
+        self.aws = aws
+        self.awsProfile = awsProfile
+        self.awsRegion = awsRegion
         self.__load_body(body)
         self.__scan_variables(self.endpoint, RestRequest.RestVar.Location.ENDPOINT)
         self.__scan_variables(self.params, RestRequest.RestVar.Location.PARAMS)
@@ -140,7 +151,7 @@ class RestRequest(SkeleYaml):
         if (content is not None):
             if (type(content) is list):
                 content = [str(item) for item in content]
-            
+
             var_list = re.findall(VARIABLE_REGEX, str(content))
             var_list = [var.replace("{", "") for var in var_list]
             var_list = [var.replace("}", "") for var in var_list]
@@ -155,7 +166,7 @@ class RestRequest(SkeleYaml):
 
     def __get_dict(self, tuples):
         """
-        Converts a list of RestTuples into a Dictionary    
+        Converts a list of RestTuples into a Dictionary
 
         Parameters
         ----------
