@@ -27,6 +27,9 @@ components:
     - name: metadata
       endpoint: "http://127.0.0.1:5000/{endpoint:quotes}"
       method: GET
+      aws: True
+      awsProfile: "dev"
+      awsRegion: "us-east-1"
       params:
         - name: api_version
           value: "{api_version}"
@@ -85,6 +88,14 @@ The following command would trigger the a GET request ...
 |SKELEREST| - username : test-test
 |SKELEREST| SUCCESS: 200
 ```
+
+### AWS Auth
+
+As shown in the `GET` request example above, the Skelerest plugin supports AWS Authorized requests.
+
+This can be turned on by setting the `aws` field to `True` in the config for the specific request.
+By default Skelerest will use the default profile and the `us-east-1` region, but these values can
+be manually specifed using the `awsProfile` and `awsRegion` fields respectively.
 
 ### Example
 
