@@ -4,6 +4,7 @@ import base64
 import datetime
 import hashlib
 import hmac
+import boto3
 
 ALGORITHM = "AWS4-HMAC-SHA256"
 CONTENT_TYPE = "application/json"
