@@ -2,11 +2,11 @@ import json
 import ast
 import boto3
 import requests as request_api
-import sys, os, base64, datetime, hashlib, hmac
 from schema import Schema, And, Optional
 from skelebot.objects.component import Activation, Component
 from skelebot.objects.skeleYaml import SkeleYaml
 from .rest_request import RestRequest
+from .aws_auth import add_aws_headers
 
 COMMAND_TEMPLATE = "{method}-{name}"
 
@@ -107,62 +107,26 @@ class Skelerest(Component):
         return subparsers
 
     def __clean_body(self, body):
-        #TODO: doc
-        body = body.replace("'", "\"")
-        body = body.replace("True", "true")
-        body = body.replace("False", "false")
-        return body
+        """
+        Clean the body of the request for use in JSON payloads
 
-    def __sign(self, key, msg):
-        #TODO: doc
-        return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+        Parameters
+        ----------
+        body : str
+            The string representation of the request body
 
-    def __get_signature_key(self, key, date_stamp, regionName, serviceName):
-        #TODO: doc
-        kDate = self.__sign(('AWS4' + key).encode('utf-8'), date_stamp)
-        kRegion = self.__sign(kDate, regionName)
-        kService = self.__sign(kRegion, serviceName)
-        kSigning = self.__sign(kService, 'aws4_request')
-        return kSigning
+        Returns
+        -------
+        clean : str
+            The clean version of the request body ready for use in a request
+        """
 
-    def __get_aws_headers(self, endpoint, profile, region, method, body, params, headers):
-        #TODO: doc
-        #TODO: cleanup, this shit is ugly (thanks, Bezos)
-        #TODO: Unit Tests
-        endpoint_parts = endpoint.replace("https://", "").split("/")
-        host = endpoint_parts[0]
-        uri = f"/{'/'.join(endpoint_parts[1:])}"
-        algorithm = 'AWS4-HMAC-SHA256'
-        service = "execute-api"
+        clean = body
+        clean = clean.replace("'", "\"")
+        clean = clean.replace("True", "true")
+        clean = clean.replace("False", "false")
+        return clean
 
-        session = boto3.Session(profile_name=profile)
-        credentials = session.get_credentials()
-
-        access_key = credentials.access_key
-        secret_key = credentials.secret_key
-        now = datetime.datetime.utcnow()
-        amz_date = now.strftime('%Y%m%dT%H%M%SZ')
-        date_stamp = now.strftime('%Y%m%d')
-        content_type = "application/json"
-
-        signed_headers = "content-type;host;x-amz-date"
-        payload_hash = hashlib.sha256(body.encode('utf-8')).hexdigest()
-        canonical_querystring = ""
-        canonical_headers = 'content-type:' + content_type + '\n' + 'host:' + host + '\n' + 'x-amz-date:' + amz_date + '\n'
-        canonical_request = method + '\n' + uri + '\n' + canonical_querystring + '\n' + canonical_headers + '\n' + signed_headers + '\n' + payload_hash
-
-        credential_scope = date_stamp + '/' + region + '/' + service + '/' + 'aws4_request'
-        string_to_sign = algorithm + '\n' + amz_date + '\n' + credential_scope + '\n' + hashlib.sha256(canonical_request.encode('utf-8')).hexdigest()
-        signing_key = self.__get_signature_key(secret_key, date_stamp, region, service)
-        signature = hmac.new(signing_key, (string_to_sign).encode('utf-8'), hashlib.sha256).hexdigest()
-
-        authorization_header = algorithm + ' ' + 'Credential=' + access_key + '/' + credential_scope + ', ' +  'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + signature
-
-        headers["content-type"] = content_type
-        headers["x-amz-date"] = amz_date
-        headers["Authorization"] = authorization_header
-
-        return headers
 
     def execute(self, config, args, host=None):
         """
@@ -214,7 +178,7 @@ class Skelerest(Component):
             print("USING AWS AUTH")
             profile = req.awsProfile
             region = req.awsRegion
-            headers = self.__get_aws_headers(endpoint, profile, region, method, body, params, headers)
+            headers = add_aws_headers(endpoint, profile, region, method, params, headers, body=body)
 
         self.__show_execution(method, endpoint, params, headers, body)
         if (method == "GET"):
