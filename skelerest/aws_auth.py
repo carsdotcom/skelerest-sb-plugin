@@ -74,7 +74,6 @@ def get_signature_key(key, date_stamp, region):
     signed_key = sign(service_key, 'aws4_request').digest()
     return signed_key
 
-# TODO: MOCK
 def get_credentials(profile):
     """
     Creates a session based on the given profile name and obtains the Auth credentials.
