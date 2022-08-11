@@ -1,5 +1,6 @@
 import argparse
 import unittest
+import copy
 from unittest import mock
 from schema import SchemaError
 from ..skelerest import Skelerest
@@ -144,6 +145,57 @@ class TestSkelerest(unittest.TestCase):
         headers = {'a': 'AA', 'b': 'BB'}
         mock_req_api.get.assert_called_with(endpoint, params=params, headers=headers)
 
+    @mock.patch('skelerest.aws_auth.datetime')
+    @mock.patch('skelerest.aws_auth.get_credentials')
+    @mock.patch('skelerest.aws_auth.hash')
+    @mock.patch('skelerest.aws_auth.sign')
+    @mock.patch('skelerest.skelerest.request_api')
+    def test_execute_aws_auth(self, mock_req_api, mock_sign, mock_hash, mock_cred, mock_dtime):
+        mock_hash.return_value = "hashed"
+
+        mock_date = mock.MagicMock()
+        mock_date.strftime.return_value = "2022-01-01"
+        mock_dtime.datetime.utcnow.return_value = mock_date
+
+        mock_signed = mock.MagicMock()
+        mock_signed.digest.return_value = "signed"
+        mock_signed.hexdigest.return_value = "hex-signed"
+        mock_sign.return_value = mock_signed
+
+        mock_response = mock.MagicMock()
+        mock_response.status_code = 200
+        mock_response.ok = True
+        mock_req_api.get.return_value = mock_response
+
+        mock_creds = mock.MagicMock()
+        mock_creds.access_key = "akey"
+        mock_creds.secret_key = "skey"
+        mock_cred.return_value = mock_creds
+
+        config = copy.deepcopy(self.CONFIG_VALID)
+        config.get("requests")[2]["aws"] = True
+        config.get("requests")[2]["awsProfile"] = "data-dev"
+        config.get("requests")[2]["awsRegion"] = "us-east-2"
+
+        skelerest = Skelerest.load(config)
+
+        parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
+        subparsers = parser.add_subparsers(dest="job")
+        subparsers = skelerest.addParsers(subparsers)
+        args = parser.parse_args([
+            'get-test-project',
+            '--param-one', '01', '--param-two', '02',
+            '--header-one', 'AA', '--header-two', 'BB',
+            '--site', 'site'
+        ])
+
+        skelerest.execute(None, args)
+
+        endpoint = "http://not a real site"
+        params = {'one': '01', 'two': '02'}
+        headers = {'a': 'AA', 'b': 'BB', 'content-type': 'application/json', 'x-amz-date': '2022-01-01', 'Authorization': 'AWS4-HMAC-SHA256 Credential=akey/2022-01-01/us-east-2/execute-api/aws4_request, SignedHeaders=content-type;host;x-amz-date, Signature=hex-signed'}
+        mock_req_api.get.assert_called_with(endpoint, params=params, headers=headers)
+
     @mock.patch('skelerest.skelerest.request_api')
     def test_execute_post(self, mock_req_api):
         mock_response = mock.MagicMock()
@@ -169,8 +221,8 @@ class TestSkelerest(unittest.TestCase):
         endpoint = "http://not a real post"
         params = {'one': '01', 'two': '02'}
         headers = {'a': 'AA', 'b': 'BB'}
-        json = {'id': '1', 'name': 'test', 'items': ['a', 'b', 'c'], 'parent': {'id': '2', 'name': 'you'}}
-        mock_req_api.post.assert_called_with(endpoint, json=json, params=params, headers=headers)
+        data = '{"id": "1", "name": "test", "items": ["a", "b", "c"], "parent": {"id": "2", "name": "you"}}'
+        mock_req_api.post.assert_called_with(endpoint, data=data, params=params, headers=headers)
 
     @mock.patch('skelerest.skelerest.request_api')
     def test_execute_put(self, mock_req_api):
@@ -197,8 +249,8 @@ class TestSkelerest(unittest.TestCase):
         endpoint = "http://not a real put"
         params = {'one': '01', 'two': '02'}
         headers = {'a': 'AA', 'b': 'BB'}
-        json = {'id': '123', 'name': 'test', 'items': ['a', 'b', 'c'], 'parent': {'id': '2', 'name': 'you'}}
-        mock_req_api.put.assert_called_with(endpoint, json=json, params=params, headers=headers)
+        data = '{"id": "123", "name": "test", "items": ["a", "b", "c"], "parent": {"id": "2", "name": "you"}}'
+        mock_req_api.put.assert_called_with(endpoint, data=data, params=params, headers=headers)
 
     @mock.patch('skelerest.skelerest.request_api')
     def test_execute_delete(self, mock_req_api):

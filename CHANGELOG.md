@@ -3,6 +3,12 @@ Documenting All Changes to the Skelerest Plugin Project
 
 ---
 
+## v1.2.0
+#### Added
+- **AWS Auth** | Adds the optional ability to send authorized requests to AWS APIs
+
+---
+
 ## v1.1.0
 #### Added
 - **Example Project** | Adds example project to get people familiar with the plugin

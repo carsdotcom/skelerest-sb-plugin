@@ -1,10 +1,12 @@
 import json
 import ast
+import boto3
 import requests as request_api
 from schema import Schema, And, Optional
 from skelebot.objects.component import Activation, Component
 from skelebot.objects.skeleYaml import SkeleYaml
 from .rest_request import RestRequest
+from .aws_auth import add_aws_headers
 
 COMMAND_TEMPLATE = "{method}-{name}"
 
@@ -99,10 +101,32 @@ class Skelerest(Component):
                 name = f"--{var.name}"
                 if (var.default is None):
                     restparser.add_argument(name, required=True, help="REQUIRED")
-                else: 
+                else:
                     restparser.add_argument(name, default=var.default, help=f"DEFAULT: {var.default}")
 
         return subparsers
+
+    def __clean_body(self, body):
+        """
+        Clean the body of the request for use in JSON payloads
+
+        Parameters
+        ----------
+        body : str
+            The string representation of the request body
+
+        Returns
+        -------
+        clean : str
+            The clean version of the request body ready for use in a request
+        """
+
+        clean = body
+        clean = clean.replace("'", "\"")
+        clean = clean.replace("True", "true")
+        clean = clean.replace("False", "false")
+        return clean
+
 
     def execute(self, config, args, host=None):
         """
@@ -127,9 +151,11 @@ class Skelerest(Component):
 
         req = self.requests[args.job]
         endpoint = req.endpoint
+        method = req.method
         params = str(req.get_params_dict())
         headers = str(req.get_headers_dict())
         body = str(req.body)
+        aws = req.aws
 
         # Populate Variables from Command Arguments
         for var in req.variables:
@@ -144,26 +170,32 @@ class Skelerest(Component):
             elif (var.location == RestRequest.RestVar.Location.BODY):
                 body = body.replace(var_key, var_value)
 
-        body_dict = ast.literal_eval(body)
+        body = self.__clean_body(body)
         params = json.loads(params.replace("'", "\""))
         headers = json.loads(headers.replace("'", "\""))
 
-        self.__show_execution(req.method, endpoint, params, headers, body)
-        if (req.method == "GET"):
+        if (aws == True):
+            print("USING AWS AUTH")
+            profile = req.awsProfile
+            region = req.awsRegion
+            headers = add_aws_headers(endpoint, profile, region, method, params, headers, body=body)
+
+        self.__show_execution(method, endpoint, params, headers, body)
+        if (method == "GET"):
             response = request_api.get(endpoint, params=params, headers=headers)
-        elif (req.method == "POST"):
-            response = request_api.post(endpoint, json=body_dict, params=params, headers=headers)
-        elif (req.method == "PUT"):
-            response = request_api.put(endpoint, json=body_dict, params=params, headers=headers)
-        elif (req.method == "DELETE"):
+        elif (method == "POST"):
+            response = request_api.post(endpoint, data=body, params=params, headers=headers)
+        elif (method == "PUT"):
+            response = request_api.put(endpoint, data=body, params=params, headers=headers)
+        elif (method == "DELETE"):
             response = request_api.delete(endpoint, params=params, headers=headers)
 
         if (response.ok):
-            self.__display(f"SUCCESS: {response.status_code}")
+            self.__display(f"SUCCESS: {response.status_code}:\n{response.content}")
             if response.text is not None:
                 self.__display(response.text)
         else:
-            self.__display(f"ERROR: {response.status_code}")
+            self.__display(f"ERROR: {response.status_code}:\n{response.content}")
             exit(1)
 
     @classmethod
