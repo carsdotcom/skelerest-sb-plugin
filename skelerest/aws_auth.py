@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import hmac
 import boto3
+from urllib.parse import urlparse
 
 ALGORITHM = "AWS4-HMAC-SHA256"
 CONTENT_TYPE = "application/json"
@@ -103,16 +104,14 @@ def split_endpoint(endpoint):
 
     Returns
     -------
-    host : str
+    hostname : str
         The name of the host taken from the endpoint URL
-    uri : str
-        The API path taken from the endpoint URL
+    path : str
+        The URI path taken from the endpoint URL
     """
 
-    endpoint_parts = endpoint.replace("https://", "").split("/")
-    host = endpoint_parts[0]
-    uri = f"/{'/'.join(endpoint_parts[1:])}"
-    return host, uri
+    url = urlparse(endpoint)
+    return url.hostname, url.path
 
 def add_aws_headers(endpoint, profile, region, method, params, headers, body=""):
     """
