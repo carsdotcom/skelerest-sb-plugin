@@ -1,5 +1,6 @@
 import re
 import json
+import copy
 from enum import Enum
 from schema import Schema, And, Or, Optional
 from skelebot.objects.skeleYaml import SkeleYaml
@@ -65,10 +66,11 @@ class RestRequest(SkeleYaml):
     params = None
     headers = None
     body = None
-    variables = None
     aws = None
     awsProfile = None
     awsRegion = None
+    body_content = None # Should not be present in the converted dict
+    variables = None # Should not be present in the converted dict
 
     def __init__(self, name, endpoint, method, params=None, headers=None, body=None, aws=False,
                  awsProfile=None, awsRegion="us-east-1"):
@@ -105,11 +107,12 @@ class RestRequest(SkeleYaml):
         self.aws = aws
         self.awsProfile = awsProfile
         self.awsRegion = awsRegion
-        self.__load_body(body)
+        self.body = body
+        self.__load_body(self.body)
         self.__scan_variables(self.endpoint, RestRequest.RestVar.Location.ENDPOINT)
         self.__scan_variables(self.params, RestRequest.RestVar.Location.PARAMS)
         self.__scan_variables(self.headers, RestRequest.RestVar.Location.HEADERS)
-        self.__scan_variables(self.body, RestRequest.RestVar.Location.BODY)
+        self.__scan_variables(self.body_content, RestRequest.RestVar.Location.BODY)
 
     def __load_body(self, body):
         """
@@ -126,7 +129,7 @@ class RestRequest(SkeleYaml):
             with open(body) as body_file:
                 body = json.load(body_file)
 
-        self.body = body
+        self.body_content = body
 
     def __scan_variables(self, content, location):
         """
@@ -208,6 +211,16 @@ class RestRequest(SkeleYaml):
         """
 
         return self.__get_dict(self.headers)
+    
+    def toDict(self):
+        bc = self.body_content
+        vrs = self.variables
+        self.body_content = None
+        self.variables = None
+        dct = super().toDict()
+        self.body_content = bc
+        self.variables = vrs
+        return dct
 
     @classmethod
     def load(cls, config):
