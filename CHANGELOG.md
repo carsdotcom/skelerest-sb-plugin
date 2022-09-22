@@ -3,6 +3,12 @@ Documenting All Changes to the Skelerest Plugin Project
 
 ---
 
+## v1.2.1
+#### Changed
+- **ToDict** | Alters the way the dictionary is generated for the classes for the purposes of scaffolding
+
+---
+
 ## v1.2.0
 #### Added
 - **AWS Auth** | Adds the optional ability to send authorized requests to AWS APIs
