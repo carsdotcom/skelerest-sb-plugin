@@ -154,7 +154,7 @@ class Skelerest(Component):
         method = req.method
         params = str(req.get_params_dict())
         headers = str(req.get_headers_dict())
-        body = str(req.body)
+        body = str(req.body_content)
         aws = req.aws
 
         # Populate Variables from Command Arguments
@@ -197,6 +197,13 @@ class Skelerest(Component):
         else:
             self.__display(f"ERROR: {response.status_code}:\n{response.content}")
             exit(1)
+
+    def toDict(self):
+        cmds = self.commands
+        self.commands = None
+        dct = super().toDict()
+        self.commands = cmds
+        return dct
 
     @classmethod
     def load(cls, config):

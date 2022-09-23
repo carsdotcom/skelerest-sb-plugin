@@ -56,14 +56,14 @@ class TestRestRequest(unittest.TestCase):
             self.assertEqual(header.value, exp_header_values[i])
             i += 1
 
-        self.assertEqual(restRequest.body["id"], "{id:0}")
-        self.assertEqual(restRequest.body["name"], "test")
-        self.assertEqual(restRequest.body["parent"]["id"], "{parent-id}")
-        self.assertEqual(restRequest.body["parent"]["name"], "{parent-name}")
+        self.assertEqual(restRequest.body_content["id"], "{id:0}")
+        self.assertEqual(restRequest.body_content["name"], "test")
+        self.assertEqual(restRequest.body_content["parent"]["id"], "{parent-id}")
+        self.assertEqual(restRequest.body_content["parent"]["name"], "{parent-name}")
 
         i = 0
         exp_items = ["a", "b", "c"]
-        for item in restRequest.body["items"]:
+        for item in restRequest.body_content["items"]:
             self.assertEqual(item, exp_items[i])
             i += 1
 
@@ -99,14 +99,14 @@ class TestRestRequest(unittest.TestCase):
         cfg["body"] = "skelerest/test/files/body.json"
         restRequest = RestRequest.load(self.CONFIG_VALID)
 
-        self.assertEqual(restRequest.body["id"], "{id:0}")
-        self.assertEqual(restRequest.body["name"], "test")
-        self.assertEqual(restRequest.body["parent"]["id"], "{parent-id}")
-        self.assertEqual(restRequest.body["parent"]["name"], "{parent-name}")
+        self.assertEqual(restRequest.body_content["id"], "{id:0}")
+        self.assertEqual(restRequest.body_content["name"], "test")
+        self.assertEqual(restRequest.body_content["parent"]["id"], "{parent-id}")
+        self.assertEqual(restRequest.body_content["parent"]["name"], "{parent-name}")
 
         i = 0
         exp_items = ["a", "b", "c"]
-        for item in restRequest.body["items"]:
+        for item in restRequest.body_content["items"]:
             self.assertEqual(item, exp_items[i])
             i += 1
 
