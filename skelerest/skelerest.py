@@ -200,9 +200,12 @@ class Skelerest(Component):
 
     def toDict(self):
         cmds = self.commands
+        reqs = self.requests
         self.commands = None
+        self.requests = [*self.requests.values()]
         dct = super().toDict()
         self.commands = cmds
+        self.requests = reqs
         return dct
 
     @classmethod
