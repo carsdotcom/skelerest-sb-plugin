@@ -3,6 +3,12 @@ Documenting All Changes to the Skelerest Plugin Project
 
 ---
 
+## v1.2.2
+#### Changed
+- **ToDict** | Alters the way the dictionary is generated for Skelerest requests to be a list, not a dict
+
+---
+
 ## v1.2.1
 #### Changed
 - **ToDict** | Alters the way the dictionary is generated for the classes for the purposes of scaffolding
